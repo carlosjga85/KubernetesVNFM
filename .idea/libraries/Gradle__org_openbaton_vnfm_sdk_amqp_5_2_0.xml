@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.openbaton:vnfm-sdk-amqp:5.2.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.openbaton/vnfm-sdk-amqp/5.2.0/68209c7e9a12abbebd0e724971f71c159a42497f/vnfm-sdk-amqp-5.2.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.openbaton/vnfm-sdk-amqp/5.2.0/bf76574f11aee2b3208122568240669b1a75eba1/vnfm-sdk-amqp-5.2.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
