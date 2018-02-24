@@ -18,9 +18,14 @@
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.openbaton:vnfm-sdk-amqp:5.2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.hibernate:hibernate-core:4.3.10.Final" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: io.kubernetes:client-java:1.0.0-beta1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.openbaton:vim-impl:5.2.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.openbaton:vim-int:5.2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.openbaton:vnfm-sdk:5.2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.openbaton:registration:5.2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.hibernate.common:hibernate-commons-annotations:4.0.5.Final" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.openbaton:monitoring:5.2.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.openbaton:vim-drivers:5.2.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.openbaton:plugin:5.2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.openbaton:common:5.2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.openbaton:exception:5.2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.openbaton:catalogue:5.2.0" level="project" />
@@ -49,6 +54,16 @@
     <orderEntry type="library" scope="PROVIDED" name="Gradle: log4j:log4j:1.2.17" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.github.stefanbirkner:system-rules:1.16.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.google.protobuf:protobuf-java:3.4.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.kjetland:mbknor-jackson-jsonschema_2.12:1.0.24" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.networknt:json-schema-validator:0.1.10" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.slf4j:slf4j-ext:1.7.25" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.rabbitmq:amqp-client:4.0.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.springframework.boot:spring-boot-starter-logging:1.5.8.RELEASE" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: ch.qos.logback:logback-classic:1.1.11" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.slf4j:jcl-over-slf4j:1.7.25" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.slf4j:jul-to-slf4j:1.7.25" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.slf4j:log4j-over-slf4j:1.7.25" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: xml-apis:xml-apis:1.0.b2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: io.swagger:swagger-annotations:1.5.12" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.squareup.okhttp:logging-interceptor:2.7.5" level="project" />
@@ -59,8 +74,6 @@
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.google.errorprone:error_prone_annotations:2.0.18" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.google.j2objc:j2objc-annotations:1.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.codehaus.mojo:animal-sniffer-annotations:1.14" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.kjetland:mbknor-jackson-jsonschema_2.12:1.0.24" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.networknt:json-schema-validator:0.1.10" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.8.7" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.8.6" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.glassfish.web:javax.el:2.2.6" level="project" />
@@ -83,14 +96,6 @@
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.apache.commons:commons-lang3:3.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.8.7" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.scala-lang:scala-library:2.12.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.slf4j:slf4j-ext:1.7.25" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: com.rabbitmq:amqp-client:4.0.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.springframework.boot:spring-boot-starter-logging:1.5.8.RELEASE" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: ch.qos.logback:logback-classic:1.1.11" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.slf4j:jcl-over-slf4j:1.7.25" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.slf4j:jul-to-slf4j:1.7.25" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.slf4j:log4j-over-slf4j:1.7.25" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: io.github.lukehutch:fast-classpath-scanner:2.0.20" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.springframework.retry:spring-retry:1.2.0.RELEASE" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.springframework.amqp:spring-amqp:1.7.4.RELEASE" level="project" />
@@ -105,9 +110,14 @@
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.openbaton:vnfm-sdk-amqp:5.2.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.hibernate:hibernate-core:4.3.10.Final" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: io.kubernetes:client-java:1.0.0-beta1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.openbaton:vim-impl:5.2.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.openbaton:vim-int:5.2.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.openbaton:vnfm-sdk:5.2.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.openbaton:registration:5.2.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.hibernate.common:hibernate-commons-annotations:4.0.5.Final" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.openbaton:monitoring:5.2.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.openbaton:vim-drivers:5.2.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.openbaton:plugin:5.2.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.openbaton:common:5.2.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.openbaton:exception:5.2.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.openbaton:catalogue:5.2.0" level="project" />
@@ -136,6 +146,16 @@
     <orderEntry type="library" scope="RUNTIME" name="Gradle: log4j:log4j:1.2.17" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: com.github.stefanbirkner:system-rules:1.16.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: com.google.protobuf:protobuf-java:3.4.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.kjetland:mbknor-jackson-jsonschema_2.12:1.0.24" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.networknt:json-schema-validator:0.1.10" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.slf4j:slf4j-ext:1.7.25" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.rabbitmq:amqp-client:4.0.3" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.springframework.boot:spring-boot-starter-logging:1.5.8.RELEASE" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: ch.qos.logback:logback-classic:1.1.11" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.slf4j:jcl-over-slf4j:1.7.25" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.slf4j:jul-to-slf4j:1.7.25" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.slf4j:log4j-over-slf4j:1.7.25" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: xml-apis:xml-apis:1.0.b2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: io.swagger:swagger-annotations:1.5.12" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: com.squareup.okhttp:logging-interceptor:2.7.5" level="project" />
@@ -146,8 +166,6 @@
     <orderEntry type="library" scope="RUNTIME" name="Gradle: com.google.errorprone:error_prone_annotations:2.0.18" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: com.google.j2objc:j2objc-annotations:1.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.codehaus.mojo:animal-sniffer-annotations:1.14" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.kjetland:mbknor-jackson-jsonschema_2.12:1.0.24" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.networknt:json-schema-validator:0.1.10" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.8.7" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.8.6" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.glassfish.web:javax.el:2.2.6" level="project" />
@@ -170,14 +188,6 @@
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.apache.commons:commons-lang3:3.5" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.8.7" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.scala-lang:scala-library:2.12.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.slf4j:slf4j-ext:1.7.25" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.rabbitmq:amqp-client:4.0.3" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.springframework.boot:spring-boot-starter-logging:1.5.8.RELEASE" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: ch.qos.logback:logback-classic:1.1.11" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.slf4j:jcl-over-slf4j:1.7.25" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.slf4j:jul-to-slf4j:1.7.25" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.slf4j:log4j-over-slf4j:1.7.25" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: io.github.lukehutch:fast-classpath-scanner:2.0.20" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.springframework.retry:spring-retry:1.2.0.RELEASE" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.springframework.amqp:spring-amqp:1.7.4.RELEASE" level="project" />
@@ -192,9 +202,14 @@
     <orderEntry type="library" scope="TEST" name="Gradle: org.openbaton:vnfm-sdk-amqp:5.2.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.hibernate:hibernate-core:4.3.10.Final" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: io.kubernetes:client-java:1.0.0-beta1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.openbaton:vim-impl:5.2.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.openbaton:vim-int:5.2.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.openbaton:vnfm-sdk:5.2.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.openbaton:registration:5.2.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.hibernate.common:hibernate-commons-annotations:4.0.5.Final" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.openbaton:monitoring:5.2.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.openbaton:vim-drivers:5.2.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.openbaton:plugin:5.2.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.openbaton:common:5.2.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.openbaton:exception:5.2.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.openbaton:catalogue:5.2.0" level="project" />
@@ -223,6 +238,16 @@
     <orderEntry type="library" scope="TEST" name="Gradle: log4j:log4j:1.2.17" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.github.stefanbirkner:system-rules:1.16.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.protobuf:protobuf-java:3.4.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: com.kjetland:mbknor-jackson-jsonschema_2.12:1.0.24" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: com.networknt:json-schema-validator:0.1.10" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.slf4j:slf4j-ext:1.7.25" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: com.rabbitmq:amqp-client:4.0.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.springframework.boot:spring-boot-starter-logging:1.5.8.RELEASE" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: ch.qos.logback:logback-classic:1.1.11" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.slf4j:jcl-over-slf4j:1.7.25" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.slf4j:jul-to-slf4j:1.7.25" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.slf4j:log4j-over-slf4j:1.7.25" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: xml-apis:xml-apis:1.0.b2" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: io.swagger:swagger-annotations:1.5.12" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.squareup.okhttp:logging-interceptor:2.7.5" level="project" />
@@ -233,8 +258,6 @@
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.errorprone:error_prone_annotations:2.0.18" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.j2objc:j2objc-annotations:1.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.codehaus.mojo:animal-sniffer-annotations:1.14" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: com.kjetland:mbknor-jackson-jsonschema_2.12:1.0.24" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: com.networknt:json-schema-validator:0.1.10" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.8.7" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.8.6" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.glassfish.web:javax.el:2.2.6" level="project" />
@@ -257,14 +280,6 @@
     <orderEntry type="library" scope="TEST" name="Gradle: org.apache.commons:commons-lang3:3.5" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.8.7" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.scala-lang:scala-library:2.12.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.slf4j:slf4j-ext:1.7.25" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: com.rabbitmq:amqp-client:4.0.3" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.springframework.boot:spring-boot-starter-logging:1.5.8.RELEASE" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: ch.qos.logback:logback-classic:1.1.11" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.slf4j:jcl-over-slf4j:1.7.25" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.slf4j:jul-to-slf4j:1.7.25" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.slf4j:log4j-over-slf4j:1.7.25" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: io.github.lukehutch:fast-classpath-scanner:2.0.20" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.springframework.retry:spring-retry:1.2.0.RELEASE" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.springframework.amqp:spring-amqp:1.7.4.RELEASE" level="project" />
