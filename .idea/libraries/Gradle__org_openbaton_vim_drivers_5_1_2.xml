@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.openbaton:vim-drivers:5.1.2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.openbaton/vim-drivers/5.1.2/aeb9aea70b322cc6e8ae8c4a22f8ab14ad7d685c/vim-drivers-5.1.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.openbaton/vim-drivers/5.1.2/b8abe8e08226388e2fe679812ea27a21a01f3e46/vim-drivers-5.1.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
