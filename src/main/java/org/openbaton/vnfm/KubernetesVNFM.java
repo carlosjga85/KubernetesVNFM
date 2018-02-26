@@ -209,8 +209,8 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
             e.printStackTrace();
         }
         //Fetching the KubernetesVIM using the kubernetes-plugin
-        resourceManagement = (ResourceManagement) context.getBean("kubernetes", 19345, "15672");
+        //resourceManagement = (ResourceManagement) context.getBean("kubernetes", 19345, "15672");
         //Using the openstack-plugin directly
-        client = (VimDriverCaller) ((RabbitPluginBroker) context.getBean("rabbitPluginBroker")).getVimDriverCaller("127.0.0.1", "admin", "openbaton", 5672, "kubernetes", "kubernetes", "kubernetes","15672", 300);
+        client = (VimDriverCaller) ((RabbitPluginBroker) context.getBean("rabbitPluginBroker")).getVimDriverCaller("127.0.0.1", "admin", "openbaton", 5672, "/", "kubernetes", "kubernetes","15672", 300);
     }
 }
