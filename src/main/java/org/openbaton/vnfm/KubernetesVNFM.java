@@ -48,6 +48,18 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
 
     private VimDriverCaller client;
 
+    private Map<String, NetworkService> networkServiceMap;
+
+    public KubernetesVNFM() {
+        super();
+        networkServiceMap = new HashMap<>();
+    }
+
+
+
+    public static String token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tNmx0YnQiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjEzZTM1Y2I2LTI2Y2MtMTFlOC1iNWQ1LTkwZTkyNTcyNjExYSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.jrj5-XLv8Qcali4ZhJWMeHKuHE8_RrsYhe-Svf6X2iccCj7j83kUp9_xTNisuhcWulV20esHxDFi48du5e5JoMCYx9r4dVL_q83fHlOMyMTZ97Un9r7QcwkrwHftvbl9WZdrhkK2LsIg02gLKUtdPrdMOMGnlnSb40aaUEL4zgHdPjKLmI31_bkbkC4opdSf7T05zCKSf5NYc_Sw7MDtmzIITjGMDsJ_LkX5cIXOMqT721FTSYtA9bwO0xvlJ5rFFmumGP8zTAavNE-spNfUIukIfP_-QCkSf_schC7KDrHz5jesFAVorx2KdEeFMA6dXreHqTC4Ue81U6s11tSgLA";
+    public static String master = "https://192.168.39.231:8443";
+
     private static Logger logger = LoggerFactory.getLogger(KubernetesVNFM.class);
 
     public static void main(String[] args){
@@ -57,23 +69,35 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
     @Override
     public VirtualNetworkFunctionRecord instantiate(VirtualNetworkFunctionRecord virtualNetworkFunctionRecord, Object scripts, Map<String, Collection<BaseVimInstance>> vimInstances) throws Exception {
 
+        NetworkService networkService;// = new NetworkService();
+
         log("INSTANCIATE", "New Instantiation");
-        log("VNFR::", virtualNetworkFunctionRecord);
+//        log("VNFR::", virtualNetworkFunctionRecord);
+        log("Scripts::", scripts);
 
         System.out.println("Trying to print something");
+        log("VNFR Name::", virtualNetworkFunctionRecord.getName());
+        log("VNFR Id::", virtualNetworkFunctionRecord.getId());
 
-        for (VirtualDeploymentUnit virtualDeploymentUnit : virtualNetworkFunctionRecord.getVdu()) {
-            log("virtualDeploymentUnit: ", virtualDeploymentUnit);
-            log("VNFC: ", virtualDeploymentUnit.getVnfc());
-            log("VNFCInstance: ", virtualDeploymentUnit.getVnfc_instance());
-//            for (VNFCInstance vnfcInstance : virtualDeploymentUnit.getVnfc_instance()) {
-//                log("VNFCInstance: ", vnfcInstance);
-//            }
+        //////////////////////////////////////////
+
+        networkService = getNetworkService(virtualNetworkFunctionRecord.getId());
+        networkService.addDeploys(virtualNetworkFunctionRecord.getName());
+        networkService.addVnfr(virtualNetworkFunctionRecord);
+        networkService.setVnfStatus(virtualNetworkFunctionRecord.getName(), "instantiated");
+
+        networkServiceMap.remove(virtualNetworkFunctionRecord.getId());
+        networkServiceMap.put(virtualNetworkFunctionRecord.getId(), networkService);
+
+        for (Map.Entry<String, NetworkService> item : networkServiceMap.entrySet()) {
+            log("Map Key", item.getKey());
+            log("Map Value", item.getValue());
         }
 
 
+//        createDeployment(virtualNetworkFunctionRecord, vimInstances);
 
-        createDeployment(virtualNetworkFunctionRecord, vimInstances);
+
 
 
 
@@ -149,21 +173,68 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
     @Override
     public VirtualNetworkFunctionRecord modify(VirtualNetworkFunctionRecord virtualNetworkFunctionRecord, VNFRecordDependency dependency) throws Exception {
 
-        log("DEPENDENCIES", dependency.toString());
-        log("TARGET", dependency.getTarget());
-        log("ID TYPE", dependency.getIdType());
-        log("PARAMETER", dependency.getParameters());
-        log("VNFC PARAMETER", dependency.getVnfcParameters());
+        NetworkService networkService;// = new NetworkService();
 
         log.info(
-                "VirtualNetworkFunctionRecord VERSION is: " + virtualNetworkFunctionRecord.getHbVersion());
-        log.info("executing modify for VNFR: " + virtualNetworkFunctionRecord.getName());
+                "Received NFVO Message: "
+                        + "MODIFY**************************************************"
+                        + " for VNFR "
+                        + virtualNetworkFunctionRecord.getName()
+                        + " and following vnfrDep: \n"
+                        + dependency.toString());
 
-        log.info("Got dependency: " + dependency);
-        log.info("Parameters are: ");
+//        log("DEPENDENCIES", dependency.toString());
+//        log("TARGET", dependency.getTarget());
+//        log("ID TYPE", dependency.getIdType());
+//        log("PARAMETER", dependency.getParameters());
+//        log("VNFC PARAMETER", dependency.getVnfcParameters());
+//
+//        log.info(
+//                "VirtualNetworkFunctionRecord VERSION is: " + virtualNetworkFunctionRecord.getHbVersion());
+//        log.info("executing modify for VNFR: " + virtualNetworkFunctionRecord.getName());
+//
+//        log.info("Got dependency: " + dependency);
+//        log.info("Parameters are: ");
         for (Map.Entry<String, DependencyParameters> entry : dependency.getParameters().entrySet()) {
             log.info("Source type: " + entry.getKey());
             log.info("Parameters: " + entry.getValue().getParameters());
+        }
+
+        ////////////////////////////////
+        String vnfr_id = virtualNetworkFunctionRecord.getId();
+        networkService = getNetworkService(vnfr_id);
+
+
+        // fill the dependency map
+        for (Map.Entry<String, DependencyParameters> entry :
+                dependency.getParameters().entrySet()) {
+            String sourceType = entry.getKey();
+            String sourceName = "";
+            for (Map.Entry<String, String> nameTypeEntry : dependency.getIdType().entrySet()) {
+                if (nameTypeEntry.getValue().equals(sourceType)) sourceName = nameTypeEntry.getKey();
+            }
+            DependencyParameters dependencyParameters = entry.getValue();
+            List<String> parameters = new LinkedList<>();
+            for (Map.Entry<String, String> pe : dependencyParameters.getParameters().entrySet()) {
+                parameters.add(pe.getKey());
+            }
+            Map<String, List<String>> sourceParams = new HashMap<>();
+            sourceParams.put(sourceName, parameters);
+            Map<String, Map<String, List<String>>> targetSourceParams = new HashMap<>();
+            targetSourceParams.put(virtualNetworkFunctionRecord.getName(), sourceParams);
+
+            networkService.addDependency(
+                    virtualNetworkFunctionRecord.getName(), sourceName, parameters);
+        }
+
+        networkService.setVnfStatus(virtualNetworkFunctionRecord.getName(), "modified");
+
+        networkServiceMap.remove(vnfr_id);
+        networkServiceMap.put(vnfr_id, networkService);
+
+        for (Map.Entry<String, NetworkService> item : networkServiceMap.entrySet()) {
+            log("Map Key", item.getKey());
+            log("Map Value", item.getValue());
         }
 
         return virtualNetworkFunctionRecord;
@@ -177,83 +248,56 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
     @Override
     public VirtualNetworkFunctionRecord terminate(VirtualNetworkFunctionRecord virtualNetworkFunctionRecord) throws Exception {
         log.info("Terminating vnfr with id " + virtualNetworkFunctionRecord.getId());
+        NetworkService networkService = getNetworkService(virtualNetworkFunctionRecord.getId());
+        networkServiceMap.remove(networkService);
 
-        try {
-            String token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tbXprdmQiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjIwMTRkMzE3LTI2YmEtMTFlOC1hNzE1LTUwMjk2MDI0MDY3OCIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.YTuFvY4-u_Wz5H3hhPvLied2fk2GZ42tCbnvi72GXwTr-8eVy-tnEsgY48WEMQjFnNwuwqneBsijUxsE8zSswD6izGyLnCtJnmuH4h3hnEmcyjqmwJIZXdDFIvPU5kLEsaNEB5GGLyPDFq-BiA81gcsu-uEZvkHvEgvETaNZ0Wjvr2-JE1dLXl5_ghr6B2ueLg-hkxAT7pXsGd8tYQ3mvB-bOZ7PpGb-6Kc1HKbmIGX0lub4E3WUMUgyQBEHJGMvnB7tReNtWfNBRRykoaT9_mMDAqMHpznGSJkIl7hXtX1cLQUqWK4P8e2idZcr6gWLFhIZ9hM8AiKir7I7UjKZJA";
-            String master = "https://192.168.39.253:8443";
-            String str_caCert = "/home/carlos/.minikube/ca.crt";
-            FileInputStream caCert = new FileInputStream(str_caCert);
-
-            ApiClient defaultClient = new ApiClient();
-            defaultClient.setBasePath(master);
-            defaultClient.setSslCaCert(caCert);
-            defaultClient.setApiKey("Bearer " + token);
-            Configuration.setDefaultApiClient(defaultClient); //Setting Kubernetes client as Default one. Necessary for the CoreV1Api
-
-            AppsV1beta1Api apiInstance = new AppsV1beta1Api();
-
-            for (VirtualDeploymentUnit virtualDeploymentUnit : virtualNetworkFunctionRecord.getVdu()) {
-
-                String name = virtualDeploymentUnit.getName();
-                String namespace = "default";
-                V1DeleteOptions body = new V1DeleteOptions();
-//                body.setApiVersion("extensions/v1beta1");
-//                body.setKind("DeleteOptions");
-//                body.setPropagationPolicy("Foreground");
-//                body.setGracePeriodSeconds((Long) 0);
-
-                String pretty = "false";
-                Integer gracePeriodSeconds = null;
-                Boolean orphanDependents = null;
-                String propagationPolicy = null;
-
-                log("Deleting Name:", name);
-                log("Deleting namespace:", namespace);
-                log("Deleting Body:", body);
-
-
-                //Todo: Deletion is not working properly yet.
-                V1Status response = apiInstance.deleteNamespacedDeployment(name, namespace, body, pretty, gracePeriodSeconds, orphanDependents, propagationPolicy);
-                log("Response Delete Deployment ", response);
+//        try {
+////            String token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tNmx0YnQiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjEzZTM1Y2I2LTI2Y2MtMTFlOC1iNWQ1LTkwZTkyNTcyNjExYSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.jrj5-XLv8Qcali4ZhJWMeHKuHE8_RrsYhe-Svf6X2iccCj7j83kUp9_xTNisuhcWulV20esHxDFi48du5e5JoMCYx9r4dVL_q83fHlOMyMTZ97Un9r7QcwkrwHftvbl9WZdrhkK2LsIg02gLKUtdPrdMOMGnlnSb40aaUEL4zgHdPjKLmI31_bkbkC4opdSf7T05zCKSf5NYc_Sw7MDtmzIITjGMDsJ_LkX5cIXOMqT721FTSYtA9bwO0xvlJ5rFFmumGP8zTAavNE-spNfUIukIfP_-QCkSf_schC7KDrHz5jesFAVorx2KdEeFMA6dXreHqTC4Ue81U6s11tSgLA";
+////            String master = "https://192.168.39.231:8443";
+//            String str_caCert = "/home/carlos/.minikube/ca.crt";
+//            FileInputStream caCert = new FileInputStream(str_caCert);
 //
-//                try {
-//                    V1Status response = apiInstance.deleteNamespacedDeployment(name, namespace, body, pretty, gracePeriodSeconds, orphanDependents, propagationPolicy);
-//                } catch ()
-            }
-        } catch (ApiException e) {
-            e.printStackTrace();
-        }
-//        NFVORequestor nfvoRequestor = new NFVORequestor("admin", "openbaton", "default", false, "127.0.0.1", "8080", "1");
-////        NfvoRequestorBuilder nfvoRequestor = NfvoRequestorBuilder.create();
-//        for (VirtualDeploymentUnit vdu : virtualNetworkFunctionRecord.getVdu()) {
-//            Set<VNFCInstance> vnfciToRem = new HashSet<>();
-//            List<BaseVimInstance> vimInstances = new ArrayList<>();
-//            BaseVimInstance vimInstance = null;
-//            try {
-//                vimInstances = nfvoRequestor.getVimInstanceAgent().findAll();
-//            } catch (SDKException e) {
-//                log.error(e.getMessage(), e);
+//            ApiClient defaultClient = new ApiClient();
+//            defaultClient.setBasePath(master);
+//            defaultClient.setSslCaCert(caCert);
+//            defaultClient.setApiKey("Bearer " + token);
+//            Configuration.setDefaultApiClient(defaultClient); //Setting Kubernetes client as Default one. Necessary for the CoreV1Api
+//
+//            AppsV1beta1Api apiInstance = new AppsV1beta1Api();
+//
+//            for (VirtualDeploymentUnit virtualDeploymentUnit : virtualNetworkFunctionRecord.getVdu()) {
+//
+//                String name = virtualDeploymentUnit.getName();
+//                String namespace = "default";
+//                V1DeleteOptions body = new V1DeleteOptions();
+////                body.setApiVersion("extensions/v1beta1");
+////                body.setKind("DeleteOptions");
+////                body.setPropagationPolicy("Foreground");
+////                body.setGracePeriodSeconds((Long) 0);
+//
+//                String pretty = "false";
+//                Integer gracePeriodSeconds = null;
+//                Boolean orphanDependents = null;
+//                String propagationPolicy = "Background";
+//
+//                log("Deleting Name:", name);
+//                log("Deleting namespace:", namespace);
+//                log("Deleting Body:", body);
+//
+//
+//                //Todo: Deletion is not working properly yet.
+//                V1Status response = apiInstance.deleteNamespacedDeployment(name, namespace, body, pretty, gracePeriodSeconds, orphanDependents, propagationPolicy);
+//                log("Response Delete Deployment ", response);
+////
+////                try {
+////                    V1Status response = apiInstance.deleteNamespacedDeployment(name, namespace, body, pretty, gracePeriodSeconds, orphanDependents, propagationPolicy);
+////                } catch ()
 //            }
-//            for (BaseVimInstance vimInstanceFind : vimInstances) {
-//                if (vdu.getVimInstanceName().contains(vimInstanceFind.getName())) {
-//                    vimInstance = vimInstanceFind;
-//                    break;
-//                }
-//            }
-//            for (VNFCInstance vnfcInstance : vdu.getVnfc_instance()) {
-//                log.debug("Releasing resources for vdu with id " + vdu.getId());
-//                try {
-//                    resourceManagement.release(vnfcInstance, vimInstance);
-//                } catch (VimException e) {
-//                    log.error(e.getMessage(), e);
-//                    throw new RuntimeException(e.getMessage(), e);
-//                }
-//                vnfciToRem.add(vnfcInstance);
-//                log.debug("Released resources for vdu with id " + vdu.getId());
-//            }
-//            vdu.getVnfc_instance().removeAll(vnfciToRem);
+//        } catch (ApiException e) {
+//            e.printStackTrace();
 //        }
-//        log.info("Terminated vnfr with id " + virtualNetworkFunctionRecord.getId());
+//
+        log.info("Terminated vnfr with id " + virtualNetworkFunctionRecord.getId());
         return virtualNetworkFunctionRecord;
     }
 
@@ -264,6 +308,65 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
 
     @Override
     public VirtualNetworkFunctionRecord start(VirtualNetworkFunctionRecord virtualNetworkFunctionRecord) throws Exception {
+        log("START:", virtualNetworkFunctionRecord.getName());
+
+        NetworkService temp_ns;
+        String env = "";
+
+        Integer inst_cont = 0;
+        for (Map.Entry<String, NetworkService> item : networkServiceMap.entrySet()) {
+            for (Map.Entry<String, String> status : item.getValue().getVnfStatusMap().entrySet()) {
+                if (status.getValue().equals("instanciated")) {
+                    inst_cont++;
+                }
+            }
+        }
+
+
+        for (Map.Entry<String, NetworkService> item : networkServiceMap.entrySet()) {
+            boolean deployed = false;
+
+            temp_ns = getNetworkService(item.getKey());
+            log("Map Key", item.getKey());
+            log("Map Value", item.getValue());
+            log("NS Status::", item.getValue().getVnfStatusMap());
+            log("temp_ns::", temp_ns);
+            for (Map.Entry<String, String> status : item.getValue().getVnfStatusMap().entrySet()) {
+                if (!status.getValue().equals("started")) {
+                    if (!status.getValue().equals("modified")) {
+                        log("I should create this Deployment::::", status.getKey());
+                        temp_ns.setVnfStatus(item.getValue().getDeploys().get(0), "started");
+                        networkServiceMap.remove(temp_ns);
+                        networkServiceMap.put(item.getKey(), temp_ns);
+                        deployed = true;
+                        inst_cont --;
+
+//                        log("ENV Var", env);
+                    }
+                }
+            }
+            if (deployed) {
+                break;
+            } else {
+                if (inst_cont == 0) {
+                    for (Map.Entry<String, String> status : item.getValue().getVnfStatusMap().entrySet()) {
+                        if (status.getValue().equals("modified")) {
+                            log("I should create AFTER Deployment::::", status.getKey());
+                            temp_ns.setVnfStatus(item.getValue().getDeploys().get(0), "started");
+                            networkServiceMap.remove(temp_ns);
+                            networkServiceMap.put(item.getKey(), temp_ns);
+//                            deployed = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        for (Map.Entry<String, NetworkService> item : networkServiceMap.entrySet()) {
+            log("Map Key", item.getKey());
+            log("Map Value", item.getValue());
+        }
+
         return virtualNetworkFunctionRecord;
     }
 
@@ -382,8 +485,8 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
         try {
 
             //Todo: Create a method for handling authentication
-            String token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tbXprdmQiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjIwMTRkMzE3LTI2YmEtMTFlOC1hNzE1LTUwMjk2MDI0MDY3OCIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.YTuFvY4-u_Wz5H3hhPvLied2fk2GZ42tCbnvi72GXwTr-8eVy-tnEsgY48WEMQjFnNwuwqneBsijUxsE8zSswD6izGyLnCtJnmuH4h3hnEmcyjqmwJIZXdDFIvPU5kLEsaNEB5GGLyPDFq-BiA81gcsu-uEZvkHvEgvETaNZ0Wjvr2-JE1dLXl5_ghr6B2ueLg-hkxAT7pXsGd8tYQ3mvB-bOZ7PpGb-6Kc1HKbmIGX0lub4E3WUMUgyQBEHJGMvnB7tReNtWfNBRRykoaT9_mMDAqMHpznGSJkIl7hXtX1cLQUqWK4P8e2idZcr6gWLFhIZ9hM8AiKir7I7UjKZJA";
-            String master = "https://192.168.39.253:8443";
+            //String token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tNmx0YnQiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjEzZTM1Y2I2LTI2Y2MtMTFlOC1iNWQ1LTkwZTkyNTcyNjExYSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.jrj5-XLv8Qcali4ZhJWMeHKuHE8_RrsYhe-Svf6X2iccCj7j83kUp9_xTNisuhcWulV20esHxDFi48du5e5JoMCYx9r4dVL_q83fHlOMyMTZ97Un9r7QcwkrwHftvbl9WZdrhkK2LsIg02gLKUtdPrdMOMGnlnSb40aaUEL4zgHdPjKLmI31_bkbkC4opdSf7T05zCKSf5NYc_Sw7MDtmzIITjGMDsJ_LkX5cIXOMqT721FTSYtA9bwO0xvlJ5rFFmumGP8zTAavNE-spNfUIukIfP_-QCkSf_schC7KDrHz5jesFAVorx2KdEeFMA6dXreHqTC4Ue81U6s11tSgLA";
+//            String master = "https://192.168.39.231:8443";
             String str_caCert = "/home/carlos/.minikube/ca.crt";
             FileInputStream caCert = new FileInputStream(str_caCert);
 
@@ -453,6 +556,23 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
                     logger.error(t.getMessage(), t);
                 }
             }
+        }
+    }
+
+    /**
+     * Get a NetworkService object from the networkServiceMap. If it does not contain the requested
+     * NetworkService yet, create and add it.
+     *
+     * @param id
+     * @return the requested NetworkService
+     */
+    private synchronized NetworkService getNetworkService(String id) {
+        if (networkServiceMap.containsKey(id)) return networkServiceMap.get(id);
+        else {
+            NetworkService networkService = new NetworkService();
+            networkServiceMap.put(id, networkService);
+            networkService.setId(id);
+            return networkService;
         }
     }
 
