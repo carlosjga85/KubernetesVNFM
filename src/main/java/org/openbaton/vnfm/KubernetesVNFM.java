@@ -355,6 +355,8 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
                             temp_ns.setVnfStatus(item.getValue().getDeploys().get(0), "started");
                             networkServiceMap.remove(temp_ns);
                             networkServiceMap.put(item.getKey(), temp_ns);
+                            env = generateEnvVariable(temp_ns.getDependencies());
+                            log("MOD-Env:", env);
 //                            deployed = true;
                         }
                     }
@@ -450,7 +452,25 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
         }
     }
 
-    private void createDeployment(VirtualNetworkFunctionRecord vnfr, Map<String, Collection<BaseVimInstance>> vimInstances) {
+    private String generateEnvVariable(Map<String, Map<String, List<String>>> dependency) {
+        String env = "";
+
+        for (Map.Entry<String, Map<String, List<String>>> entry : dependency.entrySet()) {
+            log("1st Level:", entry);
+            for (Map.Entry<String, List<String>> entry2 : entry.getValue().entrySet()) {
+                log("2nd Level:", entry2);
+                for (String list : entry2.getValue()) {
+                    log("3rd Level key", entry2.getKey());
+                    log("3rd Level value", list);
+                    env = "SERVER_" + list.toUpperCase();
+                }
+            }
+        }
+
+        return env;
+    }
+
+    private void createDeployment(NetworkService networkService, Map<String, Collection<BaseVimInstance>> vimInstances) {
         log("Creating Kubernetes Deployment", "*****");
 
         String version = "apps/v1beta1";
@@ -465,14 +485,16 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
 
 
         //Todo: Adapt the method for creating Deployment to this loop
-        for (VirtualDeploymentUnit vdu : vnfr.getVdu()) {
-            log("Creating Kubernetes Deployment************", vdu.getName());
-            name = vdu.getName();
-            label.put("app",name);
-            image = vdu.getVm_image();
-            scale_in_out = vdu.getScale_in_out();
-            for (VNFComponent vnfc : vdu.getVnfc()) {
-                network = vnfc.getConnection_point();
+        for (VirtualNetworkFunctionRecord vnfr : networkService.getVnfrList()) {
+            for (VirtualDeploymentUnit vdu : vnfr.getVdu()) {
+                log("Creating Kubernetes Deployment************", vdu.getName());
+                name = vdu.getName();
+                label.put("app", name);
+                image = vdu.getVm_image();
+                scale_in_out = vdu.getScale_in_out();
+                for (VNFComponent vnfc : vdu.getVnfc()) {
+                    network = vnfc.getConnection_point();
+                }
             }
         }
 //
