@@ -340,8 +340,6 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
                         networkServiceMap.put(item.getKey(), temp_ns);
                         deployed = true;
                         inst_cont --;
-
-//                        log("ENV Var", env);
                     }
                 }
             }
@@ -470,6 +468,26 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
         return env;
     }
 
+    private Map<String, String> addEnvVariable(Map<String, Map<String, List<String>>> dependency) {
+        String env = "";
+        Map<String, String> var = new HashMap<>();
+        String value = "10.1.0.24"; //this value should be fetched previously by executing the an instruction which get the IP address from the source Pod.
+
+        for (Map.Entry<String, Map<String, List<String>>> entry : dependency.entrySet()) {
+            for (Map.Entry<String, List<String>> entry2 : entry.getValue().entrySet()) {
+                for (String list : entry2.getValue()) {
+                    //Todo: Change the "SERVER" for an according value like entry2.getKey(), but replacing "-" for "_".
+                    //Todo:      This value has to match to variable in the container's image.
+                    env = "SERVER_" + list.toUpperCase();
+                    var.put(env, value);
+                }
+            }
+        }
+        log("**********VAR*********", var);
+
+        return var;
+    }
+
     private void createDeployment(NetworkService networkService, Map<String, Collection<BaseVimInstance>> vimInstances) {
         log("Creating Kubernetes Deployment", "*****");
 
@@ -554,6 +572,23 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
 //                                            port.setContainerPort(80);
 //                                            ports.add(port);
 //                                        container.setPorts(ports);
+                                        //Adding Environment Variable for POD_NAME and POD_IP
+                                        List<V1EnvVar> list_env = new ArrayList<>();
+                                        V1EnvVar var_ip = new V1EnvVar();
+                                        var_ip.setName("MY_POD_NAME");
+                                        V1EnvVarSource varSource = new V1EnvVarSource();
+                                        V1ObjectFieldSelector fieldSelector = new V1ObjectFieldSelector();
+                                        fieldSelector.setFieldPath("metadata.name");
+                                        varSource.setFieldRef(fieldSelector);
+                                        var_ip.setValueFrom(varSource);
+                                        list_env.add(var_ip);
+                                        V1EnvVar var_ip2 = new V1EnvVar();
+                                        var_ip2.setName("MY_POD_IP");
+                                        V1EnvVarSource varSource2 = new V1EnvVarSource();
+                                        V1ObjectFieldSelector fieldSelector2 = new V1ObjectFieldSelector();
+                                        fieldSelector2.setFieldPath("status.podIP");
+                                        varSource2.setFieldRef(fieldSelector2);
+                                        var_ip2.setValueFrom(varSource2);
                                     containers.add(container);
                                 pod_spec.containers(containers);
                             temp_spec.setSpec(pod_spec);
