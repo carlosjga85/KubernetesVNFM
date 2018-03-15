@@ -36,6 +36,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
@@ -322,6 +323,8 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
             }
         }
 
+        log("Instantiate count: ", inst_cont);
+
 
         for (Map.Entry<String, NetworkService> item : networkServiceMap.entrySet()) {
             boolean deployed = false;
@@ -334,10 +337,11 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
             for (Map.Entry<String, String> status : item.getValue().getVnfStatusMap().entrySet()) {
                 if (!status.getValue().equals("started")) {
                     if (!status.getValue().equals("modified")) {
-                        log("I should create this Deployment::::", status.getKey());
+                        log("I should create INSTANTIATED Deployment::::", status.getKey());
                         temp_ns.setVnfStatus(item.getValue().getDeploys().get(0), "started");
                         networkServiceMap.remove(temp_ns);
                         networkServiceMap.put(item.getKey(), temp_ns);
+                        createDeployment(temp_ns);
                         deployed = true;
                         inst_cont --;
                     }
@@ -349,12 +353,16 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
                 if (inst_cont == 0) {
                     for (Map.Entry<String, String> status : item.getValue().getVnfStatusMap().entrySet()) {
                         if (status.getValue().equals("modified")) {
-                            log("I should create AFTER Deployment::::", status.getKey());
+                            log("I should create MODIFIED Deployment::::", status.getKey());
                             temp_ns.setVnfStatus(item.getValue().getDeploys().get(0), "started");
                             networkServiceMap.remove(temp_ns);
                             networkServiceMap.put(item.getKey(), temp_ns);
                             env = generateEnvVariable(temp_ns.getDependencies());
                             log("MOD-Env:", env);
+                            createDeployment(temp_ns);
+//                            Map<String, String> ls_var = new HashMap<>();
+//                            ls_var = addEnvVariable(temp_ns);
+
 //                            deployed = true;
                         }
                     }
@@ -471,7 +479,7 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
     private Map<String, String> addEnvVariable(Map<String, Map<String, List<String>>> dependency) {
         String env = "";
         Map<String, String> var = new HashMap<>();
-        String value = "10.1.0.24"; //this value should be fetched previously by executing the an instruction which get the IP address from the source Pod.
+        String value; //this value should be fetched previously by executing the an instruction which get the IP address from the source Pod.
 
         for (Map.Entry<String, Map<String, List<String>>> entry : dependency.entrySet()) {
             for (Map.Entry<String, List<String>> entry2 : entry.getValue().entrySet()) {
@@ -479,6 +487,7 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
                     //Todo: Change the "SERVER" for an according value like entry2.getKey(), but replacing "-" for "_".
                     //Todo:      This value has to match to variable in the container's image.
                     env = "SERVER_" + list.toUpperCase();
+                    value = getPodIP(entry2.getKey(), null);
                     var.put(env, value);
                 }
             }
@@ -488,14 +497,56 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
         return var;
     }
 
-    private void createDeployment(NetworkService networkService, Map<String, Collection<BaseVimInstance>> vimInstances) {
+    private String getPodIP(String nameContainer, String namespace) {
+        try {
+            //Todo: Create a method for handling authentication
+            //String token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tNmx0YnQiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjEzZTM1Y2I2LTI2Y2MtMTFlOC1iNWQ1LTkwZTkyNTcyNjExYSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.jrj5-XLv8Qcali4ZhJWMeHKuHE8_RrsYhe-Svf6X2iccCj7j83kUp9_xTNisuhcWulV20esHxDFi48du5e5JoMCYx9r4dVL_q83fHlOMyMTZ97Un9r7QcwkrwHftvbl9WZdrhkK2LsIg02gLKUtdPrdMOMGnlnSb40aaUEL4zgHdPjKLmI31_bkbkC4opdSf7T05zCKSf5NYc_Sw7MDtmzIITjGMDsJ_LkX5cIXOMqT721FTSYtA9bwO0xvlJ5rFFmumGP8zTAavNE-spNfUIukIfP_-QCkSf_schC7KDrHz5jesFAVorx2KdEeFMA6dXreHqTC4Ue81U6s11tSgLA";
+//            String master = "https://192.168.39.231:8443";
+            String str_caCert = "/home/carlos/.minikube/ca.crt";
+            FileInputStream caCert = new FileInputStream(str_caCert);
+
+            ApiClient defaultClient = new ApiClient();
+            defaultClient.setBasePath(master);
+            defaultClient.setSslCaCert(caCert);
+            defaultClient.setApiKey("Bearer " + token);
+            Configuration.setDefaultApiClient(defaultClient); //Setting Kubernetes client as Default one. Necessary for the CoreV1Api
+
+            if (namespace == null)
+                namespace = "default";
+
+            CoreV1Api api = new CoreV1Api();
+
+            try {
+//            String result = api.connectGetNamespacedPodExec(name, namespace, command, cont, stderr, stdin, stdout, tty);
+                V1PodList result = api.listNamespacedPod(namespace, null, null,null,null,null,null,null,null,null);
+                for (V1Pod item : result.getItems()) {
+                    for (V1Container con : item.getSpec().getContainers()) {
+                        if (con.getName().contains(nameContainer)) {
+                            log("Name", item.getMetadata().getName());
+                            log("IP", item.getStatus().getPodIP());
+                            return item.getStatus().getPodIP();
+                        }
+                    }
+                }
+            } catch (ApiException e) {
+                System.err.println("Exception when calling CoreV1Api#listNamespacedPod");
+                e.printStackTrace();
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private void createDeployment(NetworkService networkService) {  //, Map<String, Collection<BaseVimInstance>> vimInstances) {
         log("Creating Kubernetes Deployment", "*****");
 
         String version = "apps/v1beta1";
         String kind = "Deployment";
         String name = "";
         Set<String> image = new HashSet<>();
-        Object [] vm_image = null;
+        Object [] vm_image; // = null;
         Set<VNFDConnectionPoint> network = new HashSet<>();
         Integer scale_in_out = 0;
 
@@ -589,6 +640,16 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
                                         fieldSelector2.setFieldPath("status.podIP");
                                         varSource2.setFieldRef(fieldSelector2);
                                         var_ip2.setValueFrom(varSource2);
+                                        list_env.add(var_ip2);
+                                        //Adding Environment Variable according to the Dependencies
+                                        Map<String, String> var = addEnvVariable(networkService.getDependencies());
+                                        for (Map.Entry<String, String> entryVar : var.entrySet()) {
+                                            V1EnvVar var_extra = new V1EnvVar();
+                                            var_extra.setName(entryVar.getKey());
+                                            var_extra.setValue(entryVar.getValue());
+                                            list_env.add(var_extra);
+                                        }
+                                        container.setEnv(list_env);
                                     containers.add(container);
                                 pod_spec.containers(containers);
                             temp_spec.setSpec(pod_spec);
@@ -623,7 +684,7 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
      * @param id
      * @return the requested NetworkService
      */
-    private synchronized NetworkService getNetworkService(String id) {
+    private NetworkService getNetworkService(String id) {
         if (networkServiceMap.containsKey(id)) return networkServiceMap.get(id);
         else {
             NetworkService networkService = new NetworkService();
