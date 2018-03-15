@@ -1,10 +1,12 @@
 package org.openbaton.vnfm;
 
+import com.google.gson.JsonSyntaxException;
 import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.Configuration;
 import io.kubernetes.client.apis.AppsV1beta1Api;
 import io.kubernetes.client.apis.CoreV1Api;
+import io.kubernetes.client.apis.ExtensionsV1beta1Api;
 import io.kubernetes.client.models.*;
 import io.kubernetes.client.util.Config;
 import org.openbaton.catalogue.mano.common.Event;
@@ -49,7 +51,7 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
 
     private VimDriverCaller client;
 
-    private Map<String, NetworkService> networkServiceMap;
+    private static Map<String, NetworkService> networkServiceMap;
 
     public KubernetesVNFM() {
         super();
@@ -250,8 +252,33 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
     public VirtualNetworkFunctionRecord terminate(VirtualNetworkFunctionRecord virtualNetworkFunctionRecord) throws Exception {
         log.info("Terminating vnfr with id " + virtualNetworkFunctionRecord.getId());
         NetworkService networkService = getNetworkService(virtualNetworkFunctionRecord.getId());
-        networkServiceMap.remove(networkService);
 
+        String str_caCert = "/home/carlos/.minikube/ca.crt";
+        FileInputStream caCert = new FileInputStream(str_caCert);
+
+        ApiClient defaultClient = new ApiClient();
+        defaultClient.setBasePath(master);
+        defaultClient.setSslCaCert(caCert);
+        defaultClient.setApiKey("Bearer " + token);
+        log("ApiClient", defaultClient);
+//            ApiClient client = Config.from
+        Configuration.setDefaultApiClient(defaultClient);
+
+        ExtensionsV1beta1Api apiInstance = new ExtensionsV1beta1Api(); //Creating obj for requesting information via API
+
+        log("Deleting Network:", networkService);
+        log("Deleting Deployment:", networkService.getDeploys().get(0));
+
+        try {
+            V1Status response = apiInstance.deleteNamespacedDeployment(networkService.getDeploys().get(0)+"-1", "default", new V1DeleteOptions().gracePeriodSeconds(0L).propagationPolicy("Foreground"), null, null, null, null);
+            log("Response", response);
+        } catch (ApiException e) {
+            System.err.println("Execution of deleteNamespacedDeployment");
+        } catch (JsonSyntaxException e) {
+            System.err.println("Execution of IllegalStateException");
+        }
+
+        networkServiceMap.remove(networkService);
 //        try {
 ////            String token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tNmx0YnQiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjEzZTM1Y2I2LTI2Y2MtMTFlOC1iNWQ1LTkwZTkyNTcyNjExYSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.jrj5-XLv8Qcali4ZhJWMeHKuHE8_RrsYhe-Svf6X2iccCj7j83kUp9_xTNisuhcWulV20esHxDFi48du5e5JoMCYx9r4dVL_q83fHlOMyMTZ97Un9r7QcwkrwHftvbl9WZdrhkK2LsIg02gLKUtdPrdMOMGnlnSb40aaUEL4zgHdPjKLmI31_bkbkC4opdSf7T05zCKSf5NYc_Sw7MDtmzIITjGMDsJ_LkX5cIXOMqT721FTSYtA9bwO0xvlJ5rFFmumGP8zTAavNE-spNfUIukIfP_-QCkSf_schC7KDrHz5jesFAVorx2KdEeFMA6dXreHqTC4Ue81U6s11tSgLA";
 ////            String master = "https://192.168.39.231:8443";
@@ -314,61 +341,70 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
         NetworkService temp_ns;
         String env = "";
 
-        Integer inst_cont = 0;
-        for (Map.Entry<String, NetworkService> item : networkServiceMap.entrySet()) {
-            for (Map.Entry<String, String> status : item.getValue().getVnfStatusMap().entrySet()) {
-                if (status.getValue().equals("instanciated")) {
-                    inst_cont++;
-                }
-            }
-        }
+//        Integer inst_cont = 0;
+//        for (Map.Entry<String, NetworkService> item : networkServiceMap.entrySet()) {
+//            for (Map.Entry<String, String> status : item.getValue().getVnfStatusMap().entrySet()) {
+//                if (status.getValue().equals("instanciated")) {
+//                    inst_cont++;
+//                }
+//            }
+//        }
+//
+//        log("Instantiate count: ", inst_cont);
+//
+//
 
-        log("Instantiate count: ", inst_cont);
 
+        temp_ns = getNetworkService(virtualNetworkFunctionRecord.getId());
+        log("I should create INSTANTIATED Deployment::::", temp_ns.getDeploys().get(0));
+        temp_ns.setVnfStatus(temp_ns.getDeploys().get(0), "started");
+        networkServiceMap.remove(temp_ns);
+        networkServiceMap.put(temp_ns.getId(), temp_ns);
+        createDeployment(temp_ns);
 
-        for (Map.Entry<String, NetworkService> item : networkServiceMap.entrySet()) {
-            boolean deployed = false;
-
-            temp_ns = getNetworkService(item.getKey());
-            log("Map Key", item.getKey());
-            log("Map Value", item.getValue());
-            log("NS Status::", item.getValue().getVnfStatusMap());
-            log("temp_ns::", temp_ns);
-            for (Map.Entry<String, String> status : item.getValue().getVnfStatusMap().entrySet()) {
-                if (!status.getValue().equals("started")) {
-                    if (!status.getValue().equals("modified")) {
-                        log("I should create INSTANTIATED Deployment::::", status.getKey());
-                        temp_ns.setVnfStatus(item.getValue().getDeploys().get(0), "started");
-                        networkServiceMap.remove(temp_ns);
-                        networkServiceMap.put(item.getKey(), temp_ns);
-                        createDeployment(temp_ns);
-                        deployed = true;
-                        inst_cont --;
-                    }
-                }
-            }
-            if (deployed) {
-                break;
-            } else {
-                if (inst_cont == 0) {
-                    for (Map.Entry<String, String> status : item.getValue().getVnfStatusMap().entrySet()) {
-                        if (status.getValue().equals("modified")) {
-                            log("I should create MODIFIED Deployment::::", status.getKey());
-                            temp_ns.setVnfStatus(item.getValue().getDeploys().get(0), "started");
-                            networkServiceMap.remove(temp_ns);
-                            networkServiceMap.put(item.getKey(), temp_ns);
-                            env = generateEnvVariable(temp_ns.getDependencies());
-                            log("MOD-Env:", env);
-                            createDeployment(temp_ns);
-//                            Map<String, String> ls_var = new HashMap<>();
-//                            ls_var = addEnvVariable(temp_ns);
-
-//                            deployed = true;
-                        }
-                    }
-                }
-            }
-        }
+//        for (Map.Entry<String, NetworkService> item : networkServiceMap.entrySet()) {
+//            boolean deployed = false;
+//
+//            temp_ns = getNetworkService(item.getKey());
+//            log("Map Key", item.getKey());
+//            log("Map Value", item.getValue());
+//            log("NS Status::", item.getValue().getVnfStatusMap());
+//            log("temp_ns::", temp_ns);
+//            for (Map.Entry<String, String> status : item.getValue().getVnfStatusMap().entrySet()) {
+//                if (!status.getValue().equals("started")) {
+//                    if (!status.getValue().equals("modified")) {
+//                        log("I should create INSTANTIATED Deployment::::", status.getKey());
+//                        temp_ns.setVnfStatus(item.getValue().getDeploys().get(0), "started");
+//                        networkServiceMap.remove(temp_ns);
+//                        networkServiceMap.put(item.getKey(), temp_ns);
+//                        createDeployment(temp_ns);
+//                        deployed = true;
+//                        inst_cont --;
+//                    }
+//                }
+//            }
+//            if (deployed) {
+//                break;
+//            } else {
+//                if (inst_cont == 0) {
+//                    for (Map.Entry<String, String> status : item.getValue().getVnfStatusMap().entrySet()) {
+//                        if (status.getValue().equals("modified")) {
+//                            log("I should create MODIFIED Deployment::::", status.getKey());
+//                            temp_ns.setVnfStatus(item.getValue().getDeploys().get(0), "started");
+//                            networkServiceMap.remove(temp_ns);
+//                            networkServiceMap.put(item.getKey(), temp_ns);
+//                            env = generateEnvVariable(temp_ns.getDependencies());
+//                            log("MOD-Env:", env);
+//                            createDeployment(temp_ns);
+////                            Map<String, String> ls_var = new HashMap<>();
+////                            ls_var = addEnvVariable(temp_ns);
+//
+////                            deployed = true;
+//                        }
+//                    }
+//                }
+//            }
+//        }
 
         for (Map.Entry<String, NetworkService> item : networkServiceMap.entrySet()) {
             log("Map Key", item.getKey());
@@ -458,6 +494,51 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
         }
     }
 
+    private String getPodIP(String nameContainer, String namespace) {
+        boolean not_deployed = true;
+        while (not_deployed) {
+            try {
+                //Todo: Create a method for handling authentication
+                //String token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tNmx0YnQiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjEzZTM1Y2I2LTI2Y2MtMTFlOC1iNWQ1LTkwZTkyNTcyNjExYSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.jrj5-XLv8Qcali4ZhJWMeHKuHE8_RrsYhe-Svf6X2iccCj7j83kUp9_xTNisuhcWulV20esHxDFi48du5e5JoMCYx9r4dVL_q83fHlOMyMTZ97Un9r7QcwkrwHftvbl9WZdrhkK2LsIg02gLKUtdPrdMOMGnlnSb40aaUEL4zgHdPjKLmI31_bkbkC4opdSf7T05zCKSf5NYc_Sw7MDtmzIITjGMDsJ_LkX5cIXOMqT721FTSYtA9bwO0xvlJ5rFFmumGP8zTAavNE-spNfUIukIfP_-QCkSf_schC7KDrHz5jesFAVorx2KdEeFMA6dXreHqTC4Ue81U6s11tSgLA";
+//            String master = "https://192.168.39.231:8443";
+                String str_caCert = "/home/carlos/.minikube/ca.crt";
+                FileInputStream caCert = new FileInputStream(str_caCert);
+
+                ApiClient defaultClient = new ApiClient();
+                defaultClient.setBasePath(master);
+                defaultClient.setSslCaCert(caCert);
+                defaultClient.setApiKey("Bearer " + token);
+                Configuration.setDefaultApiClient(defaultClient); //Setting Kubernetes client as Default one. Necessary for the CoreV1Api
+
+                if (namespace == null)
+                    namespace = "default";
+
+                CoreV1Api api = new CoreV1Api();
+
+                try {
+                    V1PodList result = api.listNamespacedPod(namespace, null, null,null,null,null,null,null,null,null);
+                    for (V1Pod item : result.getItems()) {
+                        for (V1Container con : item.getSpec().getContainers()) {
+                            if (con.getName().contains(nameContainer)) {
+                                log("Name", item.getMetadata().getName());
+                                log("IP", item.getStatus().getPodIP());
+                                if (item.getStatus().getPodIP() != null)
+                                    return item.getStatus().getPodIP();
+                            }
+                        }
+                    }
+                } catch (ApiException e) {
+                    System.err.println("Exception when calling CoreV1Api#listNamespacedPod");
+                    e.printStackTrace();
+                }
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
     private String generateEnvVariable(Map<String, Map<String, List<String>>> dependency) {
         String env = "";
 
@@ -497,51 +578,51 @@ public class KubernetesVNFM extends AbstractVnfmSpringAmqp {
         return var;
     }
 
-    private String getPodIP(String nameContainer, String namespace) {
-        try {
-            //Todo: Create a method for handling authentication
-            //String token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tNmx0YnQiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjEzZTM1Y2I2LTI2Y2MtMTFlOC1iNWQ1LTkwZTkyNTcyNjExYSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.jrj5-XLv8Qcali4ZhJWMeHKuHE8_RrsYhe-Svf6X2iccCj7j83kUp9_xTNisuhcWulV20esHxDFi48du5e5JoMCYx9r4dVL_q83fHlOMyMTZ97Un9r7QcwkrwHftvbl9WZdrhkK2LsIg02gLKUtdPrdMOMGnlnSb40aaUEL4zgHdPjKLmI31_bkbkC4opdSf7T05zCKSf5NYc_Sw7MDtmzIITjGMDsJ_LkX5cIXOMqT721FTSYtA9bwO0xvlJ5rFFmumGP8zTAavNE-spNfUIukIfP_-QCkSf_schC7KDrHz5jesFAVorx2KdEeFMA6dXreHqTC4Ue81U6s11tSgLA";
-//            String master = "https://192.168.39.231:8443";
-            String str_caCert = "/home/carlos/.minikube/ca.crt";
-            FileInputStream caCert = new FileInputStream(str_caCert);
-
-            ApiClient defaultClient = new ApiClient();
-            defaultClient.setBasePath(master);
-            defaultClient.setSslCaCert(caCert);
-            defaultClient.setApiKey("Bearer " + token);
-            Configuration.setDefaultApiClient(defaultClient); //Setting Kubernetes client as Default one. Necessary for the CoreV1Api
-
-            if (namespace == null)
-                namespace = "default";
-
-            CoreV1Api api = new CoreV1Api();
-
-            try {
-//            String result = api.connectGetNamespacedPodExec(name, namespace, command, cont, stderr, stdin, stdout, tty);
-                V1PodList result = api.listNamespacedPod(namespace, null, null,null,null,null,null,null,null,null);
-                for (V1Pod item : result.getItems()) {
-                    for (V1Container con : item.getSpec().getContainers()) {
-                        if (con.getName().contains(nameContainer)) {
-                            log("Name", item.getMetadata().getName());
-                            log("IP", item.getStatus().getPodIP());
-                            return item.getStatus().getPodIP();
-                        }
-                    }
-                }
-            } catch (ApiException e) {
-                System.err.println("Exception when calling CoreV1Api#listNamespacedPod");
-                e.printStackTrace();
-            }
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+//    private String getPodIP(String nameContainer, String namespace) {
+//        try {
+//            //Todo: Create a method for handling authentication
+//            //String token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tNmx0YnQiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjEzZTM1Y2I2LTI2Y2MtMTFlOC1iNWQ1LTkwZTkyNTcyNjExYSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.jrj5-XLv8Qcali4ZhJWMeHKuHE8_RrsYhe-Svf6X2iccCj7j83kUp9_xTNisuhcWulV20esHxDFi48du5e5JoMCYx9r4dVL_q83fHlOMyMTZ97Un9r7QcwkrwHftvbl9WZdrhkK2LsIg02gLKUtdPrdMOMGnlnSb40aaUEL4zgHdPjKLmI31_bkbkC4opdSf7T05zCKSf5NYc_Sw7MDtmzIITjGMDsJ_LkX5cIXOMqT721FTSYtA9bwO0xvlJ5rFFmumGP8zTAavNE-spNfUIukIfP_-QCkSf_schC7KDrHz5jesFAVorx2KdEeFMA6dXreHqTC4Ue81U6s11tSgLA";
+////            String master = "https://192.168.39.231:8443";
+//            String str_caCert = "/home/carlos/.minikube/ca.crt";
+//            FileInputStream caCert = new FileInputStream(str_caCert);
+//
+//            ApiClient defaultClient = new ApiClient();
+//            defaultClient.setBasePath(master);
+//            defaultClient.setSslCaCert(caCert);
+//            defaultClient.setApiKey("Bearer " + token);
+//            Configuration.setDefaultApiClient(defaultClient); //Setting Kubernetes client as Default one. Necessary for the CoreV1Api
+//
+//            if (namespace == null)
+//                namespace = "default";
+//
+//            CoreV1Api api = new CoreV1Api();
+//
+//            try {
+////            String result = api.connectGetNamespacedPodExec(name, namespace, command, cont, stderr, stdin, stdout, tty);
+//                V1PodList result = api.listNamespacedPod(namespace, null, null,null,null,null,null,null,null,null);
+//                for (V1Pod item : result.getItems()) {
+//                    for (V1Container con : item.getSpec().getContainers()) {
+//                        if (con.getName().contains(nameContainer)) {
+//                            log("Name", item.getMetadata().getName());
+//                            log("IP", item.getStatus().getPodIP());
+//                            return item.getStatus().getPodIP();
+//                        }
+//                    }
+//                }
+//            } catch (ApiException e) {
+//                System.err.println("Exception when calling CoreV1Api#listNamespacedPod");
+//                e.printStackTrace();
+//            }
+//
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 
     private void createDeployment(NetworkService networkService) {  //, Map<String, Collection<BaseVimInstance>> vimInstances) {
         log("Creating Kubernetes Deployment", "*****");
-
+//
         String version = "apps/v1beta1";
         String kind = "Deployment";
         String name = "";
