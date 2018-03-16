@@ -3,6 +3,7 @@ package org.openbaton.vnfm;
 import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
 import org.openbaton.catalogue.nfvo.VNFPackage;
+import org.openbaton.catalogue.nfvo.viminstances.DockerVimInstance;
 
 import java.util.*;
 
@@ -19,6 +20,8 @@ public class NetworkService {
 
     // list of Kubernetes Deployment names that will be deployed
     private List<String> deploys;
+
+    private DockerVimInstance dockerVimInstance;
 
     public NetworkService() {
         this.vnfdList = new LinkedList<>();
@@ -279,6 +282,8 @@ public class NetworkService {
                 + vnfStatusMap
 //                + "\nVnfrList: "
 //                + vnfrList
+                + "\nVimInstance: "
+                + dockerVimInstance
                 + "\nDeploys: "
                 + deploys;
     }
@@ -297,6 +302,14 @@ public class NetworkService {
 
     public void setDeploys(List<String> deploys) {
         this.deploys = deploys;
+    }
+
+    public void setDockerVimInstance( DockerVimInstance vimInstance) {
+        this.dockerVimInstance = vimInstance;
+    }
+
+    public DockerVimInstance getDockerVimInstance() {
+        return dockerVimInstance;
     }
 
 
